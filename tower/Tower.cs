@@ -10,7 +10,7 @@ class Tower
     public int _floors;
     public List<Entity>[] EntitiesOnFloor;
     public Hero? Hero { get; private set; }
-    private Random random = new Random();
+    private Random _random = new();
     private const int MaxFloors = 9;
 
     public int Floors
@@ -21,11 +21,11 @@ class Tower
             : throw new ArgumentException($"A Tower can have from 1 to {MaxFloors} floors");
     }
 
-    public Tower(int _floors)
+    public Tower(int floors)
     {
-        Floors = _floors;
-        EntitiesOnFloor = new List<Entity>[_floors + 1];
-        for (int i = 0; i <= _floors; i++)
+        Floors = floors;
+        EntitiesOnFloor = new List<Entity>[floors + 1];
+        for (int i = 0; i <= floors; i++)
         {
             EntitiesOnFloor[i] = new List<Entity>();
         }
@@ -106,72 +106,72 @@ class Tower
                     continue;
                 }
                 if (Floors <= 4)
-            {
-                if (floor <= 2)
                 {
-                    AddEntity(new Goblin(floor), floor);
-                    Console.WriteLine($"A Goblin has appeared on floor {floor}!");
-                }
-                else if (floor <= 4)
-                {
-                    AddEntity(new Ogre(floor), floor);
-                    Console.WriteLine($"An Ogre has appeared on floor {floor}!");
-                }       
-                continue;
-            }
-
-            if (Floors > 4)
-            {
-                if (floor <= 2)
-                {
-                    int goblinCount = GetRandomCount((2, 0.6), (3, 0.3), (4, 0.1));
-                    for (int i = 0; i < goblinCount; i++)
+                    if (floor <= 2)
                     {
                         AddEntity(new Goblin(floor), floor);
+                        Console.WriteLine($"A Goblin has appeared on floor {floor}!");
                     }
-                    Console.WriteLine($"A group of {goblinCount} goblins appeared on floor {floor}");
+                    else if (floor <= 4)
+                    {
+                        AddEntity(new Ogre(floor), floor);
+                        Console.WriteLine($"An Ogre has appeared on floor {floor}!");
+                    }       
                     continue;
                 }
-                if (floor >= 3 && floor != Floors)
+
+                if (Floors > 4)
                 {
-                    var enemies = new List<Entity>();
-                    Entity mainEnemy = random.NextDouble() < 0.8 ? new Ogre(floor) : new Goblin(floor);
-                    enemies.Add(mainEnemy);
-                    int extraEnemies = GetRandomCount(
-                        (1, 0.5),
-                        (2, 0.3),
-                        (3, 0.2)
-                    );
-                    for (int i = 0; i < extraEnemies; i++)
+                    if (floor <= 2)
                     {
-                        enemies.Add(random.NextDouble() < 0.7 ? new Goblin(floor) : new Ogre(floor));
+                        int goblinCount = GetRandomCount((2, 0.6), (3, 0.3), (4, 0.1));
+                        for (int i = 0; i < goblinCount; i++)
+                        {
+                            AddEntity(new Goblin(floor), floor);
+                        }
+                        Console.WriteLine($"A group of {goblinCount} goblins appeared on floor {floor}");
+                        continue;
                     }
-
-                    foreach (var enemy in enemies)
+                    if (floor != Floors)
                     {
-                        AddEntity(enemy, floor);
-                    }
+                        var enemies = new List<Entity>();
+                        Entity mainEnemy = _random.NextDouble() < 0.8 ? new Ogre(floor) : new Goblin(floor);
+                        enemies.Add(mainEnemy);
+                        int extraEnemies = GetRandomCount(
+                            (1, 0.5),
+                            (2, 0.3),
+                            (3, 0.2)
+                        );
+                        for (int i = 0; i < extraEnemies; i++)
+                        {
+                            enemies.Add(_random.NextDouble() < 0.7 ? new Goblin(floor) : new Ogre(floor));
+                        }
 
-                    int ogres = enemies.Count(e => e is Ogre);
-                    int goblins = enemies.Count(e => e is Goblin);
+                        foreach (var enemy in enemies)
+                        {
+                            AddEntity(enemy, floor);
+                        }
 
-                    string message = $"On the floor {floor} appears a group of enemies:";
-                    if (ogres > 0) message += $"{ogres} ogre,";
-                    if (goblins > 0) message += $"{goblins} goblin";
+                        int ogres = enemies.Count(e => e is Ogre);
+                        int goblins = enemies.Count(e => e is Goblin);
+
+                        string message = $"On the floor {floor} appears a group of enemies:";
+                        if (ogres > 0) message += $"{ogres} ogre,";
+                        if (goblins > 0) message += $"{goblins} goblin";
                     
-                    Console.WriteLine(message.TrimEnd(','));
+                        Console.WriteLine(message.TrimEnd(','));
+                    }
+                    if (floor == Floors && Floors >= 5)
+                    {
+                        AddEntity(new Dragon(floor), floor);
+                        Console.WriteLine($"Dragon is waiting for you on the last floor!");
+                    }
                 }
-                if (floor == Floors && Floors >= 5)
-                {
-                    AddEntity(new Dragon(floor), floor);
-                    Console.WriteLine($"Dragon is waiting for you on the last floor!");
-                }
-            }
         }
     } 
     public void SimulateFloorBattle()
     {
-        if (Hero == null || !Hero.IsAlive)
+        if (Hero is null || !Hero.IsAlive)
         {
             Console.WriteLine($"Hero can not fight!");
             return;

@@ -10,10 +10,10 @@ public class Hero : Entity
     {
         if (!IsAlive) return;
 
-        int damage = BaseDamage;
-        bool IsCrit = new Random().NextDouble() < CritChance;
+        var damage = BaseDamage;
+        var isCrit = new Random().NextDouble() < CritChance;
 
-        if (IsCrit)
+        if (isCrit)
         {
             damage = (int)(damage * CritMultiplier);
             Console.WriteLine($"{GetType().Name} will deal a critical hit!");
@@ -21,20 +21,10 @@ public class Hero : Entity
         Console.WriteLine($"{GetType().Name} attack {target.GetType().Name} and deal {damage} damage!");
         target.TakeDamage(damage);
     }
-    public int BaseHealth
-    {
-        get => base.BaseHealth;
-        set => base.BaseHealth = value >= 0 ? value : throw new ArgumentException("Health can not be less than 1");
-    }
-    public int BaseDamage
-    {
-        get => base._baseDamage;
-        set => base.BaseDamage = value >= 0 ? value : throw new ArgumentException("Damage can not be less than 1");
-    } 
     public void LevelUp()
     {
-        BaseHealth = (int)(_baseHealth * 1.3);
-        BaseDamage = (int)(_baseDamage * 1.2);
+        BaseHealth = (int)(BaseHealth * 1.3);
+        BaseDamage = (int)(BaseDamage * 1.2);
         CurrentFloor++;
         Console.WriteLine($"Hero went up to the floor {CurrentFloor}! \n New stats: {BaseHealth} HP | {BaseDamage} DMG");
     }

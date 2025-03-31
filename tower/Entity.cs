@@ -1,13 +1,17 @@
 using System.Formats.Asn1;
 using System.Reflection.Metadata;
 
+// Не используешь - удаляй.
+// YANGNI - You are not gonna need it. 
+
 namespace tower;
 
 public class Entity
 {
-    public int _baseHealth;
-    public int _baseDamage;
-    public int _currentFloor;
+    // все, что не private - С БОЛЬШОЙ БУКВЫ
+    private int _baseHealth;
+    private int _baseDamage;
+    private int _currentFloor;
     public bool IsAlive => BaseHealth > 0;
     public int CurrentFloor
     {
@@ -29,11 +33,31 @@ public class Entity
     
     public Entity(int startFloor, int baseHealth, int baseDamage)
     {
+        ValidateFields(startFloor, baseHealth, baseDamage);
+        
         BaseHealth = baseHealth;
         BaseDamage = baseDamage;
         CurrentFloor = startFloor;
     }
 
+    private void ValidateFields(int startFloor, int baseHealth, int baseDamage)
+    {
+        if (startFloor < 0)
+        {
+            throw new ArgumentException("Start floor can not be less than 0");
+        }
+
+        if (baseHealth < 0)
+        {
+            throw new ArgumentException("Base health can not be less than 0");
+        }
+
+        if (baseDamage < 0)
+        {
+            throw new ArgumentException("Base damage can not be less than 0");
+        }
+    }
+    
     public virtual void Attack(Entity target)
     {
         if (!IsAlive)

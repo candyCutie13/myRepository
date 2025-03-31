@@ -8,6 +8,8 @@ using System.Security.Cryptography;
 //Сделать нормальный ввод переменных в методе Main
 //Сделать рандом кол-во этажей в башне(от 1 до 9)
 //Откорректировать двойной удар у гоблинов
+// 1. Сделать нормальную валидацию (проверять прям в конструкторе)
+// 2. Логика боя из Main вынести в отдельный класс - Battleground(hero, tower -> 3 до 9), у которого будет метод StartBattle()
 
 namespace tower;
 
@@ -52,3 +54,21 @@ class Program
         );
     }
 }
+// tower, hero, battleground(tower, hero)
+// battleground.StartBattle() -> print()
+// Класс огр.
+// tower -> floor (расселять мобов)
+// floor (int number)
+// for(int i = 1; i <= floorsCount; i++){
+//  var floor = new Floor(i)
+//  floor.GetRandomEnemies()
+//  floor(number) -> List<Enemy>{Goblin, Ogre, Dragon}
+//
+// } 
+// GetRandomEnemies(){
+//  switch{
+//      case 1:
+//          ...
+//      }
+// }
+// циклом от 3 до 9 создать List<Floor>.Append(floor)
