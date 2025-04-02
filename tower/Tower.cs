@@ -1,36 +1,27 @@
-
 namespace tower;
 
-class Tower
+public class Tower
 {
-    public int _floors;
-    public List<Entity>[] EntitiesOnFloor;
-    public Hero? Hero { get; private set; }
-    private Random random = new Random();
+    public List<Entity>[] EntitiesOnFloor { get; set; }
+    private readonly Random _random = new();
     private const int MaxFloors = 9;
 
-    public int Floors
+    public int Floors { get; set; }
+
+    public Tower(int floors)
     {
-        get => _floors;
-        set => _floors = value >= 1 && value <= MaxFloors
-            ? value
-            : throw new ArgumentException($"A Tower can have from 1 to {MaxFloors} floors");
+        if (floors <= 0 || floors > MaxFloors) throw new ArgumentException($"Invalid number of floors: {floors}");
+        Floors = floors;
+
+        EntitiesOnFloor = new List<Entity>[Floors + 1];
+
+        for (var i = 0; i <= Floors; i++) EntitiesOnFloor[i] = [];
     }
 
-    public Tower(int _floors)
+    private int GetRandomCount(params (int count, double chance)[] options)
     {
-        Floors = _floors;
-        EntitiesOnFloor = new List<Entity>[_floors + 1];
-        for (int i = 0; i <= _floors; i++)
-        {
-            EntitiesOnFloor[i] = new List<Entity>();
-        }
-    }
-
-    public int GetRandomCount(params (int count, double chance)[] options)
-    {
-        double total = options.Sum(o => o.chance);
-        double roll = new Random().NextDouble() * total;
+        var total = options.Sum(o => o.chance);
+        var roll = new Random().NextDouble() * total;
         double accumulating = 0;
 
         foreach (var (count, chance) in options)
@@ -42,31 +33,14 @@ class Tower
 
         return options.Last().count;
     }
-    public void AddHero(Hero hero, int startFloor = 1)
-    {
-        Hero = hero;
-        AddEntity(hero, startFloor);
-    }
 
-    public bool TryClimbFloor()
-    {
-        if (Hero == null || Hero.CurrentFloor >= Floors)
-        {
-            Console.WriteLine("The hero can't get any higher");
-            return false;
-        }
-        
-        Hero.LevelUp();
-        AddEntity(Hero, Hero.CurrentFloor);
-        return true;
-    }
     public void AddEntity(Entity entity, int floor)
     {
         if (floor < 1 || floor > Floors)
             throw new ArgumentException("Invalid floor");
         if (entity == null)
             throw new ArgumentException(nameof(entity));
-        if(entity.BaseHealth < 1 || entity.BaseDamage < 1)
+        if (entity.BaseHealth < 1 || entity.BaseDamage < 1)
             throw new ArgumentException("Entity stats can not be less than 1");
 
         entity.CurrentFloor = floor;
@@ -78,92 +52,56 @@ class Tower
         Console.WriteLine($"\t Floor ({floor})\t");
         foreach (var entity in EntitiesOnFloor[floor])
         {
-            string status = entity.BaseHealth <= 0 ? "Dead" : $"{entity.BaseHealth} HP";
+            var status = entity.BaseHealth <= 0 ? "Dead" : $"{entity.BaseHealth} HP";
             Console.WriteLine($"{entity.GetType().Name}: {status}, {entity.BaseDamage} DMG");
         }
     }
 
     public void GenerateRandomEnemies()
     {
-        for (int floor = 1; floor <= Floors; floor++)
+        for (var floor = 1; floor <= Floors; floor++)
         {
-                if (Floors <= 2)
-                {
-                    if (floor == 1)
-                    {
-                        AddEntity(new Goblin(floor), floor);
-                        Console.WriteLine($"Goblin settled on the {floor} floor!");
-                    }
-                    else if (floor == 2)
-                    {
-                        AddEntity(new Ogre(floor), floor);
-                        Console.WriteLine($"An Ogre settled on the {floor} floor!");
-                    }
-                    continue;
-                }
-                if (Floors <= 4)
+            if (floor <= 2)
             {
-                if (floor <= 2)
-                {
-                    AddEntity(new Goblin(floor), floor);
-                    Console.WriteLine($"A Goblin has appeared on floor {floor}!");
-                }
-                else if (floor <= 4)
-                {
-                    AddEntity(new Ogre(floor), floor);
-                    Console.WriteLine($"An Ogre has appeared on floor {floor}!");
-                }       
+                var goblinCount = GetRandomCount((2, 0.6), (3, 0.3), (4, 0.1));
+                for (var i = 0; i < goblinCount; i++) AddEntity(new Goblin(floor), floor);
+                Console.WriteLine($"A group of {goblinCount} goblins appeared on floor {floor}");
                 continue;
             }
 
-            if (Floors > 4)
+            if (floor < Floors)
             {
-                if (floor <= 2)
-                {
-                    int goblinCount = GetRandomCount((2, 0.6), (3, 0.3), (4, 0.1));
-                    for (int i = 0; i < goblinCount; i++)
-                    {
-                        AddEntity(new Goblin(floor), floor);
-                    }
-                    Console.WriteLine($"A group of {goblinCount} goblins appeared on floor {floor}");
-                    continue;
-                }
-                if (floor >= 3 && floor != Floors)
-                {
-                    var enemies = new List<Entity>();
-                    Entity mainEnemy = random.NextDouble() < 0.8 ? new Ogre(floor) : new Goblin(floor);
-                    enemies.Add(mainEnemy);
-                    int extraEnemies = GetRandomCount(
-                        (1, 0.5),
-                        (2, 0.3),
-                        (3, 0.2)
-                    );
-                    for (int i = 0; i < extraEnemies; i++)
-                    {
-                        enemies.Add(random.NextDouble() < 0.7 ? new Goblin(floor) : new Ogre(floor));
-                    }
+                var enemies = new List<Entity>();
 
-                    foreach (var enemy in enemies)
-                    {
-                        AddEntity(enemy, floor);
-                    }
+                Entity mainEnemy = _random.NextDouble() < 0.8 ? new Ogre(floor) : new Goblin(floor);
 
-                    int ogres = enemies.Count(e => e is Ogre);
-                    int goblins = enemies.Count(e => e is Goblin);
+                enemies.Add(mainEnemy);
 
-                    string message = $"On the floor {floor} appears a group of enemies:";
-                    if (ogres > 0) message += $"{ogres} ogre,";
-                    if (goblins > 0) message += $"{goblins} goblin";
-                    
-                    Console.WriteLine(message.TrimEnd(','));
-                }
-                if (floor == Floors && Floors >= 5)
-                {
-                    AddEntity(new Dragon(floor), floor);
-                    Console.WriteLine($"Dragon is waiting for you on the last floor!");
-                }
+                var extraEnemies = GetRandomCount(
+                    (1, 0.5),
+                    (2, 0.3),
+                    (3, 0.2)
+                );
+
+                for (var i = 0; i < extraEnemies; i++)
+                    enemies.Add(_random.NextDouble() < 0.7 ? new Goblin(floor) : new Ogre(floor));
+
+                foreach (var enemy in enemies) AddEntity(enemy, floor);
+
+                var ogres = enemies.Count(e => e is Ogre);
+                var goblins = enemies.Count(e => e is Goblin);
+
+                var message = $"On the floor {floor} appears a group of enemies:";
+                if (ogres > 0) message += $"{ogres} ogre,";
+                if (goblins > 0) message += $"{goblins} goblin";
+
+                Console.WriteLine(message.TrimEnd(','));
             }
+
+            if (floor != Floors || Floors < 5) continue;
+
+            AddEntity(new Dragon(floor), floor);
+            Console.WriteLine($"Dragon is waiting for you on the last floor!");
         }
-    } 
-    
+    }
 }
