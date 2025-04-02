@@ -1,7 +1,3 @@
-using System.Net;
-using System.Net.Mail;
-using System.Security.Cryptography;
-using System.Text.RegularExpressions;
 
 namespace tower;
 
@@ -169,68 +165,5 @@ class Tower
             }
         }
     } 
-    public void SimulateFloorBattle()
-    {
-        if (Hero == null || !Hero.IsAlive)
-        {
-            Console.WriteLine($"Hero can not fight!");
-            return;
-        }
-        
-        int floor = Hero.CurrentFloor;
-        var aliveEnemies = EntitiesOnFloor[floor].Where(c => c != Hero && c.IsAlive).ToList();
-        var aliveGoblins = aliveEnemies.OfType<Goblin>().ToList();
-        var aliveOtherEnemies = aliveEnemies.Where(e => !(e is Goblin)).ToList();
-        bool isHeroStunned = false;
-
-        if (aliveEnemies.Count == 0)
-        {
-            Console.WriteLine("There is no enemies on the floor!");
-            return;
-        }
-        
-        Console.WriteLine($"\t Battle on floor {floor} \t");
-        Console.WriteLine($"Hero ({Hero.BaseHealth} HP) vs {aliveEnemies.Count} enemies");
-        while (aliveEnemies.Any(e => e.IsAlive) && Hero.IsAlive)
-        {
-            foreach (var goblin in aliveGoblins.Where(g => g.IsAlive).ToList())
-            {
-                goblin.Attack(Hero);
-                if (!Hero.IsAlive) break;
-            }
-            if (!Hero.IsAlive) break;
-            if (!isHeroStunned)
-            {
-                var enemies = aliveEnemies.Where(e => e.IsAlive).ToList();
-                if (enemies.Any())
-                {
-                    var target = enemies[new Random().Next(enemies.Count)];
-                    Hero.Attack(target);
-                }
-                else
-                {
-                    Console.WriteLine("Hero is stunned and misses a turn!");
-                    isHeroStunned = false;
-                }
-            }
-
-            foreach (var enemy in aliveOtherEnemies.Where(e => e.IsAlive).ToList())
-            {
-                enemy.Attack(Hero);
-                if (enemy is Ogre ogre && ogre.IsAlive)
-                {
-                    isHeroStunned = ogre._didStunThisTurn;
-                }
-                if (!Hero.IsAlive) break;
-            }
-        }
-
-        if (!Hero.IsAlive) Console.WriteLine("Hero is dead...");
-        else
-        {
-            Console.WriteLine($"Hero defeated all the enemies on the floor {floor}!");
-            Console.WriteLine($"{Hero.BaseHealth} health left");
-        }
-        EntitiesOnFloor[floor].RemoveAll(c => c.BaseHealth <= 0);
-    }
+    
 }
