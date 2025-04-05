@@ -53,7 +53,7 @@ public class Tower
         foreach (var entity in EntitiesOnFloor[floor])
         {
             var status = entity.BaseHealth <= 0 ? "Dead" : $"{entity.BaseHealth} HP";
-            Console.WriteLine($"{entity.GetType().Name}: {status}, {entity.BaseDamage} DMG");
+            Console.WriteLine($"{entity.GetType().Name}: {status}, {entity.BaseDamage} DMG, {entity.BaseArmor}% Armor");
         }
     }
 

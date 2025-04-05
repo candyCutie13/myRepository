@@ -24,13 +24,15 @@ public class Ogre : Entity
     public override void TakeDamage(int damage)
     {
         base.TakeDamage(damage);
-        if(!IsAlive) Console.WriteLine("The Ogre died!");
+        
+        if(!IsAlive) Console.WriteLine($"The {GetType().Name} died!");
     }
 
     public Ogre(int floor) : base(
         baseHealth: 150 + (floor - 1) * 15,
         baseDamage: 15 + (floor - 1) * 5,
-        startFloor: floor
+        startFloor: floor,
+        baseArmor: 5
         ) {}
     
     public override string ToString() => $"Ogre (\t HP: {BaseHealth} \t DMG: {BaseDamage})";

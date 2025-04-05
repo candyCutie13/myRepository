@@ -4,8 +4,14 @@ public class Hero : Entity
 {
     private const double CritChance = 0.25;
     private const double CritMultiplier = 1.75;
-    public Hero(int baseHealth, int baseDamage, int startFloor) : base(startFloor, baseHealth, baseDamage){}
+    public Hero(int baseHealth, int baseDamage, int startFloor) : base(startFloor, baseHealth, baseDamage, baseArmor: 10){}
 
+    public override void TakeDamage(int damage)
+    {
+        base.TakeDamage(damage);
+        
+        if(!IsAlive) Console.WriteLine($"The {GetType().Name} died!");
+    }
     public override void Attack(Entity target)
     {
         if (!IsAlive) return;

@@ -17,6 +17,7 @@ public class Battleground
     public void StartBattle()
     {
         Console.Write("Hero begins his ascent\nPress ENTER to start ascending");
+        
         Console.ReadLine();
 
         while (_hero.IsAlive && _hero.CurrentFloor <= _tower.Floors)
@@ -79,11 +80,11 @@ public class Battleground
 
         Console.WriteLine();
         Console.WriteLine($"\t Battle on floor {floor} \t");
-        Console.WriteLine($"Hero ({_hero.BaseHealth} HP) vs {aliveEnemies.Count} enemies");
+        Console.WriteLine($"Hero vs {aliveEnemies.Count} enemies");
         Console.WriteLine();
         while (aliveEnemies.Any(e => e.IsAlive) && _hero.IsAlive)
         {
-            Thread.Sleep(1500);
+            //Thread.Sleep(1500);
             foreach (var goblin in aliveGoblins.Where(g => g.IsAlive).ToList())
             {
                 goblin.Attack(_hero);
