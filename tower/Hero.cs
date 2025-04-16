@@ -52,7 +52,7 @@ public class Hero : Entity
         Attack(target);
     }
 
-    public override string ToString() => $"Hero (Floor: {CurrentFloor} \t HP: {BaseHealth} \t DMG: {BaseDamage})";
+    public override string ToString() => $"Hero - Floor: {CurrentFloor}  HP: {BaseHealth}  DMG: {BaseDamage}  {BaseArmor}% Armor";
 }
 
 

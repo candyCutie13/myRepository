@@ -16,9 +16,14 @@ public class Battleground
     // ctrl + r + r = поменять везде
     public void StartBattle()
     {
+        
         Console.Write("Hero begins his ascent\nPress ENTER to start ascending");
         
         Console.ReadLine();
+        if (_hero.CurrentFloor == 1)
+        {
+            Console.WriteLine(_hero.ToString());
+        }
 
         while (_hero.IsAlive && _hero.CurrentFloor <= _tower.Floors)
         {
